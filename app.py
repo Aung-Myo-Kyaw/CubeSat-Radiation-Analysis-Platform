@@ -2,6 +2,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+from modules.parser import (
+    load_csv,
+    get_max_dose,
+    get_min_dose,
+    get_max_let
+)
 st.set_page_config(
     page_title="CubeSat Radiation Analysis Platform",
     layout="wide"
@@ -44,7 +50,7 @@ def classify_risk(dose):
 
 
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    df = load_csv(uploaded_file)
 
     required_columns = ["Thickness_mm", "Dose_Gy", "LET_keV_um"]
 
@@ -67,10 +73,10 @@ if uploaded_file is not None:
 
     df["Risk_Level"] = df["Dose_Gy"].apply(classify_risk)
 
-    max_dose = df["Dose_Gy"].max()
-    min_dose = df["Dose_Gy"].min()
+    max_dose = get_max_dose(df)
+    min_dose = get_min_dose(df)
     avg_dose = df["Dose_Gy"].mean()
-    max_let = df["LET_keV_um"].max()
+    max_let = get_max_let(df)
 
     optimal_row = df.loc[df["Dose_Gy"].idxmin()]
     optimal_thickness = optimal_row["Thickness_mm"]
